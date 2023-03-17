@@ -1,8 +1,8 @@
-local QBCore = exports['qb-core']:GetCoreObject()
+ESX = exports["es_extended"]:getSharedObject()
 
 RegisterNetEvent("npwd:qb-mail:getMail", function()
 	local src = source
-	local Player  = QBCore.Functions.GetPlayer(src)
+	local Player  = ESX.GetPlayerFromId(src)
 	local mailResults = MySQL.query.await('SELECT `citizenid`, `sender`, `subject`, `message`, `read`, `mailid`, `date`, `button` FROM player_mails WHERE citizenid = ? ORDER BY date DESC', {Player.PlayerData.citizenid})
 	
 	for i = 1, #mailResults do
@@ -19,20 +19,20 @@ end)
 
 RegisterNetEvent('npwd:qb-mail:updateRead', function(data)
 	local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
+    local Player = ESX.GetPlayerFromId(src)
 	MySQL.update('UPDATE player_mails SET `read` = 1 WHERE mailid = ? AND citizenid = ?', {data, Player.PlayerData.citizenid})
 end)
 
 RegisterNetEvent('npwd:qb-mail:deleteMail', function(data)
 	local src = source
-    local Player = QBCore.Functions.GetPlayer(src)	
+    local Player = ESX.GetPlayerFromId(src)	
 	local result =  MySQL.query.await('DELETE FROM player_mails WHERE mailid = ? AND citizenid = ?', {data, Player.PlayerData.citizenid})
 	TriggerClientEvent('npwd:qb-mail:mailDeleted', src, result)
 end)
 
 RegisterNetEvent('npwd:qb-mail:updateButton', function(id)
 	local src = source
-    local Player = QBCore.Functions.GetPlayer(src)	
+    local Player = ESX.GetPlayerFromId(src)	
 	local result =  MySQL.update.await('UPDATE player_mails SET `button` = NULL WHERE mailid = ? AND citizenid = ?', {id, Player.PlayerData.citizenid})
 	TriggerClientEvent('npwd:qb-mail:buttonUpdated', src, result)
 end)
@@ -46,7 +46,7 @@ end
 
 RegisterNetEvent('qb-phone:server:sendNewMail', function(mailData)
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
+    local Player = ESX.GetPlayerFromId(src)
 	local mailid = GenerateMailId()
     if mailData.button == nil then
         MySQL.insert('INSERT INTO player_mails (`citizenid`, `sender`, `subject`, `message`, `mailid`, `read`) VALUES (?, ?, ?, ?, ?, ?)', {Player.PlayerData.citizenid, mailData.sender, mailData.subject, mailData.message, mailid, 0})
@@ -66,7 +66,7 @@ RegisterNetEvent('qb-phone:server:sendNewMail', function(mailData)
 end)
 
 RegisterNetEvent('qb-phone:server:sendNewMailToOffline', function(citizenid, mailData)
-    local Player = QBCore.Functions.GetPlayerByCitizenId(citizenid)
+    local Player = ESX.GetPlayerFromIdentifier(citizenid)
     if Player then
         local src = Player.PlayerData.source
 		local mailid = GenerateMailId()
