@@ -1,4 +1,3 @@
-local QBCore = exports['qb-core']:GetCoreObject()
 
 RegisterNUICallback("npwd:qb-mail:getMail", function(_, cb)
 	TriggerServerEvent("npwd:qb-mail:getMail")
